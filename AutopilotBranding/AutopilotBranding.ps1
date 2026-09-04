@@ -65,11 +65,13 @@ function Check-NuGetProvider {
 	if (-not $provider) {
 		Log 'NuGet Provider Package not detected, installing...'
 		Install-PackageProvider -Name NuGet -Force | Out-Null
-	} elseif ($provider.Version -lt $MinimumVersion) {
+	}
+ elseif ($provider.Version -lt $MinimumVersion) {
 		Log "NuGet provider v$($provider.Version) is less than required v$MinimumVersion; updating."
 		Install-PackageProvider -Name NuGet -Force | Out-Null
         
-	} else {
+	}
+ else {
 		Log "NuGet provider meets min requirements (v:$($provider.Version))."
 	}
     
@@ -91,15 +93,15 @@ if ("$env:PROCESSOR_ARCHITEW6432" -ne "ARM64") {
 }
 
 # Create output folder
-if (-not (Test-Path "$($env:ProgramData)\Microsoft\AutopilotBranding")) {
-	Mkdir "$($env:ProgramData)\Microsoft\AutopilotBranding" -Force
+if (-not (Test-Path "$($env:ProgramData)\Microsoft\ExoBranding")) {
+	Mkdir "$($env:ProgramData)\Microsoft\ExoBranding" -Force
 }
 
 # Start logging
-Start-Transcript "$($env:ProgramData)\Microsoft\AutopilotBranding\AutopilotBranding.log"
+Start-Transcript "$($env:ProgramData)\Microsoft\ExoBranding\ExoBranding.log"
 
 # Creating tag file
-Set-Content -Path "$($env:ProgramData)\Microsoft\AutopilotBranding\AutopilotBranding.ps1.tag" -Value "Installed"
+Set-Content -Path "$($env:ProgramData)\Microsoft\ExoBranding\ExoBranding.ps1.tag" -Value "Installed"
 
 # STEP 0: Bail out if we aren't in OOBE
 $TypeDef = @"
@@ -121,18 +123,17 @@ Add-Type -TypeDefinition $TypeDef -Language CSharp
 $IsOOBEComplete = $false
 $null = [Api.Kernel32]::OOBEComplete([ref] $IsOOBEComplete)
 if ($IsOOBEComplete) {
-	if (-not $Force)
-	{
+	if (-not $Force) {
 		Log "OOBE is completed, bailing out without doing any configuration."
-  		Stop-Transcript
+		Stop-Transcript
 		exit 0
-	} else {
+	}
+ else {
 		Log "OOBE is completed but -Force specified, will run anyway."
 	}
 }
 
-try 
-{
+try {
 	# PREP: Load the Config.xml
 	$installFolder = "$PSScriptRoot\"
 	Log "Install folder: $installFolder"
@@ -149,10 +150,12 @@ try
 		if ($config.Config.SkipStartLayout -ine "true") {
 			Log "Importing layout: $($installFolder)Layout.xml"
 			Copy-Item "$($installFolder)Layout.xml" "C:\Users\Default\AppData\Local\Microsoft\Windows\Shell\LayoutModification.xml" -Force
-		} else {
+		}
+		else {
 			Log "Skipping Start layout (Windows 10)"
 		}
-	} else {
+	}
+ else {
 		if ($config.Config.SkipStartLayout -ine "true") {
 			Log "Copying Start menu layout: $($installFolder)Start2.bin"
 			MkDir -Path "C:\Users\Default\AppData\Local\Packages\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\LocalState" -Force -ErrorAction SilentlyContinue | Out-Null
@@ -160,7 +163,8 @@ try
 			Log "Copying Start menu settings: $($installFolder)settings.dat"
 			MkDir -Path "C:\Users\Default\AppData\Local\Packages\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\Settings" -Force -ErrorAction SilentlyContinue | Out-Null
 			Copy-Item "$($installFolder)settings.dat" "C:\Users\Default\AppData\Local\Packages\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\Settings\settings.dat" -Force
-		} else {
+		}
+		else {
 			Log "Skipping Start layout (Windows 11)"
 		}
 
@@ -171,39 +175,42 @@ try
 			& reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" /v LayoutXMLPath /t REG_EXPAND_SZ /d "%SystemRoot%\OEM\TaskbarLayoutModification.xml" /f /reg:64 2>&1 | Out-Null
 			Log "Unpin the Microsoft Store app from the taskbar"
 			& reg.exe add "HKLM\TempUser\Software\Policies\Microsoft\Windows\Explorer" /v NoPinningStoreToTaskbar /t REG_DWORD /d 1 /f /reg:64 2>&1 | Out-Null
-		} else {
+		}
+		else {
 			Log "Skipping Taskbar layout (Windows 11)"
 		}
 	}
 
 	# STEP 2: Configure background
 	if ($config.Config.SkipTheme -ine "true") {
-		Log "Setting up Autopilot theme"
+		Log "Setting up Exo theme"
 		Mkdir "C:\Windows\Resources\OEM Themes" -Force | Out-Null
-		Copy-Item "$installFolder\Autopilot.theme" "C:\Windows\Resources\OEM Themes\Autopilot.theme" -Force
-		Mkdir "C:\Windows\web\wallpaper\Autopilot" -Force | Out-Null
-		Copy-Item "$installFolder\Autopilot.jpg" "C:\Windows\web\wallpaper\Autopilot\Autopilot.jpg" -Force
-		Log "Setting Autopilot theme as the new user default"
-		& reg.exe add "HKLM\TempUser\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes" /v InstallTheme /t REG_EXPAND_SZ /d "%SystemRoot%\resources\OEM Themes\Autopilot.theme" /f /reg:64 2>&1 | Out-Null
-		& reg.exe add "HKLM\TempUser\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes" /v CurrentTheme /t REG_EXPAND_SZ /d "%SystemRoot%\resources\OEM Themes\Autopilot.theme" /f /reg:64 2>&1 | Out-Null
-	} else {
-		Log "Skipping Autopilot theme"
+		Copy-Item "$installFolder\Exo.theme" "C:\Windows\Resources\OEM Themes\Exo.theme" -Force
+		Mkdir "C:\Windows\web\wallpaper\Exo" -Force | Out-Null
+		Copy-Item "$installFolder\Exo.jpg" "C:\Windows\web\wallpaper\Exo\Exo.jpg" -Force
+		Log "Setting Exo theme as the new user default"
+		& reg.exe add "HKLM\TempUser\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes" /v InstallTheme /t REG_EXPAND_SZ /d "%SystemRoot%\resources\OEM Themes\Exo.theme" /f /reg:64 2>&1 | Out-Null
+		& reg.exe add "HKLM\TempUser\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes" /v CurrentTheme /t REG_EXPAND_SZ /d "%SystemRoot%\resources\OEM Themes\Exo.theme" /f /reg:64 2>&1 | Out-Null
+	}
+ else {
+		Log "Skipping Exo theme"
 	}
 
 	# STEP 2A: Set lock screen image, see https://www.systemcenterdudes.com/apply-custom-lock-screen-wallpaper-using-intune/
 	if ($config.Config.SkipLockScreen -ine "true") {
 		Log "Configuring lock screen image"
 		$RegPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\PersonalizationCSP"
-		Mkdir "C:\Windows\web\wallpaper\Autopilot" -Force | Out-Null
-		$LockScreenImage = "C:\Windows\web\wallpaper\Autopilot\AutopilotLock.jpg"
-		Copy-Item "$installFolder\AutopilotLock.jpg" $LockScreenImage -Force
+		Mkdir "C:\Windows\web\wallpaper\Exo" -Force | Out-Null
+		$LockScreenImage = "C:\Windows\web\wallpaper\Exo\ExoLock.jpg"
+		Copy-Item "$installFolder\ExoLock.jpg" $LockScreenImage -Force
 		if (!(Test-Path -Path $RegPath)) {
 			New-Item -Path $RegPath -Force | Out-Null
 		}
 		New-ItemProperty -Path $RegPath -Name LockScreenImagePath -Value $LockScreenImage -PropertyType String -Force | Out-Null
 		New-ItemProperty -Path $RegPath -Name LockScreenImageUrl -Value $LockScreenImage -PropertyType String -Force | Out-Null
 		New-ItemProperty -Path $RegPath -Name LockScreenImageStatus -Value 1 -PropertyType DWORD -Force | Out-Null
-	} else {
+	}
+ else {
 		Log "Skipping lock screen image"
 	}
 
@@ -221,7 +228,8 @@ try
 	if ($config.Config.SkipLeftAlignStart -ine "true") {
 		Log "Configuring left aligned Start menu"
 		& reg.exe add "HKLM\TempUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v TaskbarAl /t REG_DWORD /d 0 /f /reg:64 2>&1 | Out-Null
-	} else {
+	}
+ else {
 		Log "Skipping Left align start"
 	}
 
@@ -233,8 +241,8 @@ try
 			Log "Attempting to Hide widgets via Reg Key"	
 			$output = & reg.exe add "HKLM\TempUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v TaskbarDa /t REG_DWORD /d 0 /f /reg:64 2>&1
 			#write-host $output
-			if($LASTEXITCODE -ne 0) {
-			throw $output
+			if ($LASTEXITCODE -ne 0) {
+				throw $output
 			}
 			Log "Widgets Hidden Completed"
 		}
@@ -242,17 +250,18 @@ try
 			$errorMessage = $_.Exception.Message
 			#Write-Host "This is the error: $errorMessage"
 			if ($errorMessage -like '*Access is denied*') {
-			Log "UCPD driver may active"
-			Log "Attempting Widget Hiding workaround (TaskbarDa)"
-			$regExePath = (Get-Command reg.exe).Source
-			$tempRegExe = "$($env:TEMP)\reg1.exe"
-			Copy-Item -Path $regExePath -Destination $tempRegExe -Force -ErrorAction Stop
-			& $tempRegExe add "HKLM\TempUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v TaskbarDa /t REG_DWORD /d 0 /f /reg:64 2>&1 | Out-Null
-			Remove-Item $tempRegExe -Force -ErrorAction SilentlyContinue
-			Log "Widget Workaround Completed"
+				Log "UCPD driver may active"
+				Log "Attempting Widget Hiding workaround (TaskbarDa)"
+				$regExePath = (Get-Command reg.exe).Source
+				$tempRegExe = "$($env:TEMP)\reg1.exe"
+				Copy-Item -Path $regExePath -Destination $tempRegExe -Force -ErrorAction Stop
+				& $tempRegExe add "HKLM\TempUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v TaskbarDa /t REG_DWORD /d 0 /f /reg:64 2>&1 | Out-Null
+				Remove-Item $tempRegExe -Force -ErrorAction SilentlyContinue
+				Log "Widget Workaround Completed"
 			}
 		}
-	} else {
+	}
+ else {
 		Log "Skipping Hide widgets"
 	}
 
@@ -274,7 +283,8 @@ try
 	if ($config.Config.TimeZone) {
 		Log "Setting time zone: $($config.Config.TimeZone)"
 		Set-Timezone -Id $config.Config.TimeZone
-	} else {
+	}
+ else {
 		# Enable location services so the time zone will be set automatically (even when skipping the privacy page in OOBE) when an administrator signs in
 		Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\location" -Name "Value" -Type "String" -Value "Allow" -Force
 		Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Sensor\Overrides\{BFA794E4-F964-4FDB-90F6-51056BFE4B44}" -Name "SensorPermissionState" -Type "DWord" -Value 1 -Force
@@ -308,7 +318,8 @@ try
 		$client = new-object System.Net.WebClient
 		if ($env:PROCESSOR_ARCHITECTURE -eq "ARM64") {
 			$url = $config.Config.OneDriveARMSetup
-		} else {
+		}
+		else {
 			$url = $config.Config.OneDriveSetup
 		}
 		Log "Downloading OneDriveSetup: $url"
@@ -326,28 +337,28 @@ try
 			& reg.exe add "HKLM\TempUser\Software\Microsoft\Windows\CurrentVersion\Run" /f /reg:64 2>&1 | Out-Null	
 			Log "Run Key created"	
 		}
-        else{ 
-            Log "Run Key Already Exists"
-        }
+		else { 
+			Log "Run Key Already Exists"
+		}
 
 		$RunValueName = "OneDriveSetup"
 		Log "Looking for per-user OneDriveSetup REG_SZ"
 		# Check for the existence of string OneDriveSetup which should have the value ( C:\Windows\System32\OneDriveSetup.exe /thfirstsetup )
 		# This is creating multiple Onedrives launching at sign. Remove as no longer needed once Machine-Wide installer is run.
 		if (Get-ItemProperty -Path $RegRunPath -Name $RunValueName -ErrorAction SilentlyContinue) {
-    		Log "Per-User '$RunValueName'  still exists. Cleaning up."
+			Log "Per-User '$RunValueName'  still exists. Cleaning up."
 			& reg.exe delete "HKLM\TempUser\Software\Microsoft\Windows\CurrentVersion\Run" /v "OneDriveSetup" /f /reg:64 2>&1 | Out-Null
 			Log "Per-User '$RunValueName' removed."
 		}
 		else {
-    		 Log "'$RunValueName' per-user not found. This is Good."
+			Log "'$RunValueName' per-user not found. This is Good."
 		}
 
 		#OneDriveSetup should set these keys but can take an additional reboot after copying binaries. This should jump start OneDrive at first User Login.
 		Log "Setting OneDrive to Autostart from Machine-Wide location"
 		$OnedrivePath = '"C:\Program Files\Microsoft OneDrive\OneDrive.exe" /background'
 		#& reg.exe add "HKLM\TempUser\Software\Microsoft\Windows\CurrentVersion\Run" /v 'OneDrive' /t REG_SZ /d $OnedrivePath /f /reg:64 2>&1 #| Out-Null
-        New-Itemproperty -Path $RegRunPath -Name 'OneDrive' -Value $OnedrivePath -PropertyType String -Force | Out-Null
+		New-Itemproperty -Path $RegRunPath -Name 'OneDrive' -Value $OnedrivePath -PropertyType String -Force | Out-Null
 	}
 
 	# STEP 8: Don't let Edge create a desktop shortcut (roams to OneDrive, creates mess)
@@ -388,7 +399,8 @@ try
 			$proc = Start-Process -FilePath "C:\Program Files (x86)\Microsoft\EdgeUpdate\MicrosoftEdgeUpdate.exe" -argumentlist "/silent /install appguid={56EB18F8-B008-4CBD-B6D2-8C97FE7E9062}&appname=Microsoft%20Edge&needsadmin=True" -PassThru -WindowStyle Hidden
 			$proc.WaitForExit()
 			Log "Edge Updater Triggered" 
-		} else {
+		}
+		else {
 			Log "Edge for Business Updated"
 		}
 
@@ -401,11 +413,12 @@ try
 		Remove-Item $bookmarks -Force
 	}
 	$Bookmarksregpath = "HKLM:\SOFTWARE\Microsoft\MicrosoftEdge\Main\FavoriteBarItems"
-	if (test-path $Bookmarksregpath){
-	Remove-Item -path $Bookmarksregpath -Recurse -Force
-	Log "OEM Edge Bookmarks were detected and removed successfully"
-	}else{
-	Log "No OEM Edge Booksmarks were detected"
+	if (test-path $Bookmarksregpath) {
+		Remove-Item -path $Bookmarksregpath -Recurse -Force
+		Log "OEM Edge Bookmarks were detected and removed successfully"
+	}
+	else {
+		Log "No OEM Edge Booksmarks were detected"
 	}
 
 
@@ -447,7 +460,7 @@ try
 					catch {}
 				}
 			}
-			}
+		}
 		catch {
 			Log "Unexpected error querying Windows optional features: $_"
 		}
@@ -468,7 +481,8 @@ try
 					}
 				}
 			}
-		} catch {
+		}
+		catch {
 			Log "Unexpected error querying Windows capabilities: $_"
 		}
 	}
@@ -525,10 +539,10 @@ try
 		#& reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\OEMInformation" /v SupportURL /t REG_SZ /d "$($config.Config.OEMInfo.SupportURL)" /f /reg:64 2>&1 #| Out-Null
 		New-ItemProperty -Path $OEMpath -Name 'SupportURL' -PropertyType String -Value $config.Config.OEMInfo.SupportURL -Force | Out-Null
 		
-	if (Test-Path "$installFolder\$($config.Config.OEMInfo.Logo)") { 
-		Log "BMP Logo Found copying.."
-    	Copy-Item "$installFolder\$($config.Config.OEMInfo.Logo)" "C:\Windows\$($config.Config.OEMInfo.Logo)" -Force 
-		New-ItemProperty -Path $OEMpath -Name 'Logo' -PropertyType String -Value $config.Config.OEMInfo.Logo -Force | Out-Null
+		if (Test-Path "$installFolder\$($config.Config.OEMInfo.Logo)") { 
+			Log "BMP Logo Found copying.."
+			Copy-Item "$installFolder\$($config.Config.OEMInfo.Logo)" "C:\Windows\$($config.Config.OEMInfo.Logo)" -Force 
+			New-ItemProperty -Path $OEMpath -Name 'Logo' -PropertyType String -Value $config.Config.OEMInfo.Logo -Force | Out-Null
 		}
 		#Copy-Item "$installFolder\$($config.Config.OEMInfo.Logo)" "C:\Windows\$($config.Config.OEMInfo.Logo)" -Force
 		#& reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\OEMInformation" /v Logo /t REG_SZ /d "C:\Windows\$($config.Config.OEMInfo.Logo)" /f /reg:64 2>&1 #| Out-Null
@@ -551,7 +565,8 @@ try
 			Log "Registering template: $($_.FullName)"
 			Register-UevTemplate -Path $_.FullName
 		}
-	} else {
+	}
+ else {
 		Log "Skipping UE-V"
 	}
 
@@ -573,7 +588,8 @@ try
 			Log "  Removing Outlook for Windows key"
 			Remove-Item -Path $OutlookNew -Force
 		}
-	} else {
+	}
+ else {
 		Log "Skipping autoinstalling app logic"
 	}
 
@@ -615,7 +631,8 @@ try
 			}
 		}
 		
-	} else {
+	}
+ else {
 		Log 'Skipping WinGet installs'
 	}
 
@@ -624,8 +641,7 @@ try
 	if ($config.Config.SkipChromeConfig -ine "true") {
 		Log "Copying Chrome initial_preferences file"
 		$dest = "C:\Program Files\Google\Chrome\Application"
-		if (-not (Test-Path $dest))
-		{
+		if (-not (Test-Path $dest)) {
 			MkDir $dest -Force | Out-Null
 		}
 		Copy-Item "$PSScriptRoot\initial_preferences" "$dest\" -Force
@@ -643,7 +659,8 @@ try
 		New-ItemProperty -Path $registryPath -Name "PrivacyConsentStatus" -Value 1 -PropertyType DWord -Force | Out-Null
 		New-ItemProperty -Path $registryPath -Name "ProtectYourPC" -Value 3 -PropertyType DWord -Force | Out-Null
 		Log 'APv2 extra pages disabled'
-	} else {
+	}
+ else {
 		Log 'Skipping APv2 tweaks'
 	}
 
@@ -659,7 +676,8 @@ try
 			#Nuget v 2.8.5.201 is required to import mtniehaus's PS Gallery Script Update-InboxApp
 			$minrequired = [version]'2.8.5.201'
 			Check-NuGetProvider -MinimumVersion $minrequired
-		} catch {
+		}
+		catch {
 			Log "Error updating NuGet"
 		}
 		try {
@@ -669,7 +687,8 @@ try
 			Log 'Updating inbox apps'
 			# The path might not be set right to find this, so we'll hard-code the location
 			Get-AppxPackage -AllUsers | Select-Object -Unique PackageFamilyName | . "C:\Program Files\WindowsPowerShell\Scripts\Update-InboxApp.ps1" -Verbose
-		} catch {
+		}
+		catch {
 			Log "Error updating in-box apps: $_"
 		}
 		try {
@@ -677,10 +696,12 @@ try
 			$ns = 'Root\cimv2\mdm\dmmap'
 			$class = 'MDM_EnterpriseModernAppManagement_AppManagement01'
 			Get-CimInstance -Namespace $ns -ClassName $class | Invoke-CimMethod -MethodName UpdateScanMethod
-		} catch {
+		}
+		catch {
 			Log "Error triggering Windows Update scan: $_"
 		}
-	} else {
+	}
+ else {
 		Log 'Skipping updates'
 	}
 
@@ -691,10 +712,12 @@ try
 		New-ItemProperty -Path $registryPath -Name "EnableFirstLogonAnimation" -Value 0 -PropertyType DWord -Force | Out-Null
 		New-ItemProperty -Path $registryPath -Name "DelayedDesktopSwitchTimeout" -Value 0 -PropertyType DWord -Force | Out-Null
 	}
-} catch {
+}
+catch {
 	Log "Unhandled exception: $_"
-} finally {
-Log "All Steps Completed"
+}
+finally {
+	Log "All Steps Completed"
 }
 
 $stopUtc = [datetime]::UtcNow
@@ -710,7 +733,7 @@ else {
 	$runTimeFormatted = 'Duration: {0:mm} min {0:ss} sec' -f $runTime
 }
 
-Log 'Autopilot Branding Complete'
+Log 'Exo Branding Complete'
 Log "Total Script $($runTimeFormatted)"
 
 $ProgressPreference = $OriginalProgressPreference 

@@ -4,16 +4,16 @@
   <SkipLeftAlignStart>true</SkipLeftAlignStart>
   <SkipUpdates>false</SkipUpdates>
   <SkipWinGet>false</SkipWinGet>
-  <SkipHideWidgets>false</SkipHideWidgets>
-  <SkipStartLayout>false</SkipStartLayout>
-  <SkipTaskbarLayout>false</SkipTaskbarLayout>
+  <SkipHideWidgets>true</SkipHideWidgets>
+  <SkipStartLayout>true</SkipStartLayout>
+  <SkipTaskbarLayout>true</SkipTaskbarLayout>
   <SkipTheme>false</SkipTheme>
   <SkipLockScreen>false</SkipLockScreen>
-  <SkipAutoinstallingApps>false</SkipAutoinstallingApps>
+  <SkipAutoinstallingApps>true</SkipAutoinstallingApps>
   <SkipShowDesktopFaster>false</SkipShowDesktopFaster>
   <SkipAPv2>false</SkipAPv2>
-  <SkipEdgeUpdate>false</SkipEdgeUpdate>
-  <SkipRemoveCopilotPWA>true</SkipRemoveCopilotPWA>
+  <SkipEdgeUpdate>true</SkipEdgeUpdate>
+  <SkipRemoveCopilotPWA>false</SkipRemoveCopilotPWA>
   <SkipEnterpriseGVLK>true</SkipEnterpriseGVLK>
    <!-- Only set 'SkipDisableWidgets' to false if you want to completely disable Widgets-->
   <SkipDisableWidgets>true</SkipDisableWidgets> 
@@ -22,7 +22,7 @@
   <!-- Settings for various items-->
   <TimeZone></TimeZone>
   <RemoveApps>
-    <App>Clipchamp.Clipchamp</App>
+    <!--App>Clipchamp.Clipchamp</App>
     <App>Microsoft.BingNews</App>
     <App>Microsoft.BingWeather</App>
     <App>Microsoft.GamingApp</App>
@@ -57,20 +57,21 @@
     <App>MicrosoftCorporationII.MicrosoftFamily</App>
     <App>MicrosoftTeams</App>
     <App>MSTeams</App>
-    <!-- Microsoft Copilot -->
-    <App>9NHT9RB2F4HD</App>
+    <App>9NHT9RB2F4HD</App-->
+    <!-- above is Microsoft Copilot-->
+
   </RemoveApps>
   <WinGetInstall>
-    <Id>Google.Chrome</Id>
+    <!--Id>Google.Chrome</Id-->
     <!-- Microsoft 365 Copilot -->
-    <Id>9WZDNCRD29V9</Id>
+    <!--Id>9WZDNCRD29V9</Id-->
   </WinGetInstall>
-  <OneDriveSetup>https://go.microsoft.com/fwlink/?linkid=844652</OneDriveSetup>
+  <!-- <OneDriveSetup>https://go.microsoft.com/fwlink/?linkid=844652</OneDriveSetup>
   <OneDriveARMSetup>https://go.microsoft.com/fwlink/?linkid=2282608</OneDriveARMSetup>
   <EdgeBusinessMSI>https://go.microsoft.com/fwlink/?LinkID=2093437</EdgeBusinessMSI>
-  <EdgeBusinessARM></EdgeBusinessARM>
+  <EdgeBusinessARM></EdgeBusinessARM> -->
   <AddFeatures>
-    <Feature>Microsoft.Windows.Sense.Client~~~~</Feature>
+    <!-- <Feature>Microsoft.Windows.Sense.Client~~~~</Feature> -->
     <!-- If you do add a language pack, make sure you add these language add-ons for each one.
     <Feature>Language.Basic~~~es-ES~0.0.1.0</Feature>
     <Feature>Language.Fonts.PanEuropeanSupplementalFonts~~~~0.0.1.0</Feature>
@@ -79,7 +80,7 @@
     <Feature>Language.Speech~~~es-ES~0.0.1.0</Feature>
     <Feature>Language.TextToSpeech~~~es-ES~0.0.1.0</Feature>
     -->
-    <Feature>WMIC</Feature>
+    <!-- <Feature>WMIC</Feature> -->
     <!-- If you want .NET 3.5, uncomment this one.
     <Feature>NetFX3~~~~</Feature>
     -->
@@ -94,19 +95,19 @@
   <!-- This section defines a list of Windows Capabilities to remove. Provide the name of the Capability to have it removed as returned by Get-WindowsCapability, excluding the tildes and version.  -->
   <RemoveCapability>
     <Capability>App.StepsRecorder</Capability>
-    <Capability>Microsoft.Windows.PowerShell.ISE</Capability>
+    <!-- <Capability>Microsoft.Windows.PowerShell.ISE</Capability> -->
   </RemoveCapability>
   <Language></Language>
   <!-- If you want to set a language, customize and reference this file: <Language>Language.xml</Language> -->
-  <DefaultApps>Associations.xml</DefaultApps>
+  <!-- <DefaultApps>Associations.xml</DefaultApps> -->
   <RegisteredOwner>Autopilot User</RegisteredOwner>
-  <RegisteredOrganization>Contoso</RegisteredOrganization>
-  <OEMInfo>
+  <RegisteredOrganization>Exolaunch GmbH</RegisteredOrganization>
+  <!--OEMInfo>
     <Manufacturer>Contoso</Manufacturer>
     <Model>PC</Model>
-    <Logo>Contoso.bmp</Logo>
+    <Logo>Exo.bmp</Logo>
     <SupportPhone>+1 800-555-1212</SupportPhone>
     <SupportHours>8am-5pm PST</SupportHours>
     <SupportURL>http://www.contoso.com</SupportURL>
-  </OEMInfo>
+  </OEMInfo-->
 </Config>

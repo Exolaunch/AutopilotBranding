@@ -1,7 +1,7 @@
-; Copyright © Microsoft Corp.
+; Copyright ï¿½ Microsoft Corp.
 
 [Theme]
-DisplayName=Autopilot
+DisplayName=Exolaunch
 SetLogonBackground=0
 
 ; Computer - SHIDI_SERVER
@@ -41,7 +41,7 @@ DefaultValue=Windows Default
 DefaultValue.MUI=@main.cpl,-1020
 
 [Control Panel\Desktop]
-Wallpaper=%SystemRoot%\web\wallpaper\Autopilot\Autopilot.jpg
+Wallpaper=%SystemRoot%\web\wallpaper\Exo\Exo.jpg
 TileWallpaper=0
 WallpaperStyle=10
 Pattern=

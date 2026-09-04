@@ -14,11 +14,13 @@ Select-Object -First 1
 if (-not $provider) {
     Write-Verbose 'NuGet Provider Package not detected, installing...'
     Install-PackageProvider -Name NuGet -Force | Out-Null
-} elseif ($provider.Version -lt $MinimumVersion) {
+}
+elseif ($provider.Version -lt $MinimumVersion) {
     Write-Verbose "NuGet provider v$($provider.Version) is less than required v$MinimumVersion; updating."
     Install-PackageProvider -Name NuGet -Force | Out-Null
     
-} else {
+}
+else {
     Write-Verbose "NuGet provider meets min requirements (v:$($provider.Version))."
 }
 
@@ -30,7 +32,7 @@ Import-Module SvRooij.ContentPrep.Cmdlet
 if ($OutputFolder -eq "") {
     $OutputFolder = $PSScriptRoot
 }
-if (Test-Path "$OutputFolder\AutopilotBranding.intunewin") {
-    Remove-Item "$OutputFolder\AutopilotBranding.intunewin"
+if (Test-Path "$OutputFolder/AutopilotBranding.intunewin") {
+    Remove-Item "$OutputFolder/AutopilotBranding.intunewin"
 }
 New-IntuneWinPackage -SourcePath $SourceFolder -SetupFile $SetupFile -DestinationPath $OutputFolder
