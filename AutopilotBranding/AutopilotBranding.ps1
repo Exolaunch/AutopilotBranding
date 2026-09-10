@@ -101,7 +101,8 @@ if (-not (Test-Path "$($env:ProgramData)\Microsoft\ExoBranding")) {
 Start-Transcript "$($env:ProgramData)\Microsoft\ExoBranding\ExoBranding.log"
 
 # Creating tag file
-Set-Content -Path "$($env:ProgramData)\Microsoft\ExoBranding\ExoBranding.ps1.tag" -Value "Installed"
+Set-Content -Path "$($env:ProgramData)\Microsoft\ExoBranding\ExoBrandingLockScreen.ps1.tag" -Value "Installed"
+Set-Content -Path "$($env:ProgramData)\Microsoft\ExoBranding\ExoBrandingTheme.ps1.tag" -Value "Installed"
 
 # STEP 0: Bail out if we aren't in OOBE
 $TypeDef = @"
@@ -191,8 +192,54 @@ try {
 		Log "Setting Exo theme as the new user default"
 		& reg.exe add "HKLM\TempUser\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes" /v InstallTheme /t REG_EXPAND_SZ /d "%SystemRoot%\resources\OEM Themes\Exo.theme" /f /reg:64 2>&1 | Out-Null
 		& reg.exe add "HKLM\TempUser\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes" /v CurrentTheme /t REG_EXPAND_SZ /d "%SystemRoot%\resources\OEM Themes\Exo.theme" /f /reg:64 2>&1 | Out-Null
+		Log "Setting Exo theme as the logged in user default"
+		# $userAccount = (Get-CimInstance Win32_ComputerSystem).UserName
+
+		# if ($userAccount) {
+		# 	$userName = $userAccount.Split('\')[-1]
+
+		# 	if ($userName -ine "defaultuser0") {
+		# 		Log "User account is $userAccount"
+		# 		Log "Username is $userName."
+		# 		$profile = Get-CimInstance Win32_UserProfile |
+		# 		Where-Object {
+		# 			$_.Loaded -and
+		# 			-not $_.Special -and
+		# 			(Split-Path $_.LocalPath -Leaf) -eq $userName
+		# 		} |
+		# 		Select-Object -First 1
+		# 		Log "Profile is $profile."
+    
+		# 		# PREP: Load the default user registry
+    
+		# 		$registryRoot = "HKU\$($profile.SID)"
+		# 		Log "User Registry root is $registryRoot"
+		# 		Log "(usermode) Setting Exo theme as the user default"
+		# 		& reg.exe add "$registryRoot\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes" /v InstallTheme /t REG_EXPAND_SZ /d "%SystemRoot%\resources\OEM Themes\Exo.theme" /f /reg:64 2>&1 | Out-Null
+		# 		& reg.exe add "$registryRoot\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes" /v CurrentTheme /t REG_EXPAND_SZ /d "%SystemRoot%\resources\OEM Themes\Exo.theme" /f /reg:64 2>&1 | Out-Null
+		# 	}
+		# 	else {
+		# 		Log "defaultuser0 is active. The theme will apply at next logon."
+		# 	}
+		# }
+		# else {
+		# 	Log "No interactive user found. The theme will apply at next logon."
+		# }
+
+		# $themePath = "C:\Windows\Resources\OEM Themes\Exo.theme"
+		# $themeTaskScript = "$($env:ProgramData)\Microsoft\ExoBranding\ApplyExoThemeTask.ps1"
+		# $activeSetupPath = "HKLM:\SOFTWARE\Microsoft\Active Setup\Installed Components\ExoBrandingTheme"
+		# $themeCommand = "$env:WINDIR\System32\WindowsPowerShell\v1.0\powershell.exe -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$themeTaskScript`""
+
+		#Copy-Item "$installFolder\ApplyExoThemeTask.ps1" $themeTaskScript -Force
+		#New-Item -Path $activeSetupPath -Force | Out-Null
+		#New-ItemProperty -Path $activeSetupPath -Name "(Default)" -Value "Apply Exo theme" -PropertyType String -Force | Out-Null
+		#New-ItemProperty -Path $activeSetupPath -Name "Version" -Value "1,0,0,0" -PropertyType String -Force | Out-Null
+		#New-ItemProperty -Path $activeSetupPath -Name "StubPath" -Value $themeCommand -PropertyType String -Force | Out-Null
+
+		#Log "Registered Exo theme Active Setup for the first logon"
 	}
- else {
+	else {
 		Log "Skipping Exo theme"
 	}
 
@@ -210,7 +257,7 @@ try {
 		New-ItemProperty -Path $RegPath -Name LockScreenImageUrl -Value $LockScreenImage -PropertyType String -Force | Out-Null
 		New-ItemProperty -Path $RegPath -Name LockScreenImageStatus -Value 1 -PropertyType DWORD -Force | Out-Null
 	}
- else {
+	else {
 		Log "Skipping lock screen image"
 	}
 
@@ -229,7 +276,7 @@ try {
 		Log "Configuring left aligned Start menu"
 		& reg.exe add "HKLM\TempUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v TaskbarAl /t REG_DWORD /d 0 /f /reg:64 2>&1 | Out-Null
 	}
- else {
+	else {
 		Log "Skipping Left align start"
 	}
 
@@ -261,7 +308,7 @@ try {
 			}
 		}
 	}
- else {
+	else {
 		Log "Skipping Hide widgets"
 	}
 
@@ -284,7 +331,7 @@ try {
 		Log "Setting time zone: $($config.Config.TimeZone)"
 		Set-Timezone -Id $config.Config.TimeZone
 	}
- else {
+	else {
 		# Enable location services so the time zone will be set automatically (even when skipping the privacy page in OOBE) when an administrator signs in
 		Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\location" -Name "Value" -Type "String" -Value "Allow" -Force
 		Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Sensor\Overrides\{BFA794E4-F964-4FDB-90F6-51056BFE4B44}" -Name "SensorPermissionState" -Type "DWord" -Value 1 -Force
@@ -566,7 +613,7 @@ try {
 			Register-UevTemplate -Path $_.FullName
 		}
 	}
- else {
+	else {
 		Log "Skipping UE-V"
 	}
 
@@ -589,7 +636,7 @@ try {
 			Remove-Item -Path $OutlookNew -Force
 		}
 	}
- else {
+	else {
 		Log "Skipping autoinstalling app logic"
 	}
 
@@ -632,7 +679,7 @@ try {
 		}
 		
 	}
- else {
+	else {
 		Log 'Skipping WinGet installs'
 	}
 
@@ -660,7 +707,7 @@ try {
 		New-ItemProperty -Path $registryPath -Name "ProtectYourPC" -Value 3 -PropertyType DWord -Force | Out-Null
 		Log 'APv2 extra pages disabled'
 	}
- else {
+	else {
 		Log 'Skipping APv2 tweaks'
 	}
 
@@ -701,7 +748,7 @@ try {
 			Log "Error triggering Windows Update scan: $_"
 		}
 	}
- else {
+	else {
 		Log 'Skipping updates'
 	}
 

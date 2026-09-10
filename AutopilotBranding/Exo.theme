@@ -51,8 +51,12 @@ Path=%ResourceDir%\Themes\Aero\Aero.msstyles
 ColorStyle=NormalColor
 Size=NormalSize
 AutoColorization=0
-ColorizationColor=0XC40078D7
+ColorizationColor=0xC42ED1C8
 SystemMode=Dark
+AppMode=Dark
+
+[Personalize]
+ColorPrevalence=1
 
 [boot]
 SCRNSAVE.EXE=
@@ -63,4 +67,3 @@ MTSM=RJSPBS
 [Sounds]
 ; IDS_SCHEME_DEFAULT
 SchemeName=@%SystemRoot%\System32\mmres.dll,-800
-

@@ -1,0 +1,47 @@
+# The requirement is configured to run as the logged-in user. The user ESP UI
+# runs through wwahost in that same session.
+$webhookUri = 'https://n8n.exolaunch.com/webhook/intune-local-admins'
+$result = 0
+
+try {
+    $userName = (Get-CimInstance Win32_ComputerSystem).UserName
+
+    if ($userName) {
+        $sid = ([System.Security.Principal.NTAccount]$userName).Translate(
+            [System.Security.Principal.SecurityIdentifier]
+        ).Value
+
+        $path = "HKLM:\SOFTWARE\Microsoft\Windows\Autopilot\EnrollmentStatusTracking\$sid\Setup"
+
+        $value = Get-ItemPropertyValue `
+            -LiteralPath $path `
+            -Name HasProvisioningCompleted `
+            -ErrorAction Stop
+
+        # 0 = ESP Setup is still active
+        # Any non-zero value = ESP Setup completed
+        if ([uint32]$value -eq 0) {
+            $result = 1
+        }
+    }
+}
+catch {
+    $result = 0
+}
+
+Write-Output $result
+
+
+$payload = @{
+    status = $result
+    computerName = $env:COMPUTERNAME
+    timestampUtc = (Get-Date).ToUniversalTime().ToString('o')
+}
+
+try {
+    Invoke-RestMethod -Uri $webhookUri -Method Post -ContentType 'application/json' `
+        -Body ($payload | ConvertTo-Json -Compress)
+} catch {
+}
+
+exit 0

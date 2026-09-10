@@ -89,8 +89,6 @@
   <DisableOptionalFeatures>
     <Feature>MicrosoftWindowsPowershellV2Root</Feature>
     <Feature>WorkFolders-Client</Feature>
-    <Feature>Recall</Feature>
-    <Feature>MediaPlayback</Feature>
   </DisableOptionalFeatures>
   <!-- This section defines a list of Windows Capabilities to remove. Provide the name of the Capability to have it removed as returned by Get-WindowsCapability, excluding the tildes and version.  -->
   <RemoveCapability>
